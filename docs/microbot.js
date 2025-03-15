@@ -227,7 +227,7 @@ window.addEventListener("hashchange", (e) =>
   initmap(e.oldURL.substring(e.oldURL.indexOf("#"))),
 );
 
-$("clearmap").addEventListener("click", (e) => drawfloor());
+// $("clearmap").addEventListener("click", (e) => drawfloor());
 
 // const clearmapcode = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 // $("clearmap").addEventListener("click", e => {loadfloormap(clearmapcode); output("Map cleared.", true);});
