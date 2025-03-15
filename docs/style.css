@@ -1,0 +1,156 @@
+* {
+    color: white;
+    background-color: #202225;
+}
+
+body {
+    font-family: serif, monospace;
+    font-size: 12px;
+    padding: 10px;
+    text-align: center;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+.board {
+    width: 500px;
+    float: left;
+}
+
+.buttonswrapper {
+    line-height: 25px;
+}
+
+#mapbuttons button {
+    margin: 0 2px;
+}
+
+#table {
+    height: 500px;
+    width: 500px;
+    border-collapse: collapse;
+    user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+}
+
+#table.noedit {
+    pointer-events: none;
+}
+
+.tablerow {
+    height: 20px;
+    width: 500px;
+}
+
+td {
+    padding: 0;
+}
+
+.cell div {
+    height: 20px;
+    width: 20px;
+    text-align: center;
+}
+
+.cell .wall {
+    background-color: deepskyblue;
+}
+
+.cell .empty {
+    background-color: lightgrey;
+}
+
+.cell .clean {
+    background-color: white;
+}
+
+.cell .startpad {
+    background-color: orange;
+}
+
+.cell .bot {
+    background-color: lime;
+}
+
+.cell .success {
+    background-color: lime;
+}
+
+.cell .failed {
+    background-color: red;
+}
+
+.rightwrapper {
+    float: right;
+}
+
+#stepwrap {
+    display: none;
+}
+
+#ruleswrap {
+    position: relative;
+}
+
+#ruleswrap.plain {
+    height: 330px;
+    width: 100%;
+}
+
+#ruleswrap.ide {
+    height: 500px;
+    width: 100%;
+}
+
+#rules.plain {
+    resize: vertical;
+    height: 320px;
+    width: 550px;
+}
+
+#rules.fdrag {
+    background-color: white;
+    font-size: 0;
+    background-image: url("import.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#spinner {
+    display: none;
+    position: absolute;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+    top: 40%;
+    height: 30px;
+    width: 30px;
+    animation: rotate 0.8s infinite linear;
+    border: 10px solid #fff;
+    border-right-color: transparent;
+    border-radius: 50%;
+}
+
+@keyframes rotate {
+    0%    { transform: rotate(0deg); }
+    100%  { transform: rotate(360deg); }
+}
+
+.check {
+    vertical-align: middle;
+}
+
+#db_engine_checkboxes {
+    display: none;
+}
+
+#output {
+    font-size: 12px;
+    resize: none;
+}

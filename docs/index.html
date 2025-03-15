@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <title>Microbot</title>
+  <link rel="canonical" href="https://microbot.mzhao.dev/" />
+  <link rel="stylesheet" type="text/css" href="tln/tln.css" />
+  <link rel="stylesheet" type="text/css" href="style.css" />
+  <script type="text/javascript" src="tln/tln.js" defer></script>
+  <script type="text/javascript" src="microbot.js" defer></script>
+</head>
+<body>
+  <div class="header">
+    <h1>Microbot</h1>
+    <p style="position: absolute; top: 10px; right: 150px; font-size: 20px;"><b><a href="readme.html">Readme</a></b></p>
+  </div>
+  <div class="game">
+    <div class="board">
+      <table id="table" oncontextmenu="return false" title="Click for walls, right-click to remove walls, shift+click to set the starting pad.">
+	<caption>
+	  <div class="buttonswrapper">
+	    <button id="clearmap">Clear Map</button>
+	    <!-- <button id="fillmap">Fill Map</button> -->
+	    <div id="mapbuttons"></div>
+	  </div>
+	</caption>
+      </table>
+    </div>
+    <div class="rightwrapper">
+      <div class="buttonswrapper" id="runwrap">
+	<button id="run">Run</button>
+	<button id="testall">Test All</button>
+      </div>
+      <div class="buttonswrapper" id="stepwrap">
+	<button id="step1">1 step</button>
+	<button id="step10">10 steps</button>
+	<button id="auto">auto</button>
+      </div>
+      <div class="buttonswrapper">
+	<button id="resetrules">Reset Rules</button>
+	<button id="switchmode">Show Line #'s</button>
+	<button id="importf">import file</button>
+	<input type="file" id="impfile" style="display: none"/>
+      </div>
+      <div id="ruleswrap">
+	<textarea id="rules" class="plain" spellcheck="false"></textarea>
+	<div id="spinner"></div>
+      </div>
+      <div class="buttonswrapper">
+	<label><input type="checkbox" class="check" id="debug_warnings" checked />warnings</label>
+	<label><input type="checkbox" class="check" id="debug_microbot" checked />microbot debug</label>
+	<label><input type="checkbox" class="check" id="show_debug" />engine debug</label>
+	<div id="db_engine_checkboxes">
+	  <button id="flush">flush</button>
+	  <label><input type="checkbox" class="check" id="debug_initmap" />initmap()</label>
+	</div>
+      </div>
+      <textarea id="output" rows="10" cols="80" title="Output Console" readonly></textarea>
+    </div>
+  </div>
+</body>
+</html>

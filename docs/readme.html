@@ -1,0 +1,59 @@
+<h1>Microbot</h1>
+
+<p><a href="https://microbot.mzhao.dev/">https://microbot.mzhao.dev/</a></p>
+
+<p><a href="https://github.com/mzhaodev/microbot">GitHub</a></p>
+
+<p>Microbot is a finite-state machine turtle programming game. Given a map, the goal is to define a state transition mapping such that the microbot, following the mapping, will reach all open squares regardless of its starting position.</p>
+
+<p>This project was developed to help students in a high school computer science class test their solutions to a homework assignment.</p>
+
+<h2>Instructions</h2>
+
+<p>The state of a bot consists of:</p>
+
+<ul>
+<li>An integer value from 0-255 (8 bits of storage).</li>
+<li>The presence or absence of walls in its four adjacent cells (north, east, west, south).</li>
+</ul>
+
+
+<p>Mappings should be formatted:</p>
+
+<p><code>
+A BBBB -&gt; C D
+</code></p>
+
+<p>This means: &ldquo;A bot with state <code>A BBBB</code> should move in direction <code>C</code> and update its integer value to <code>D</code>.&rdquo;</p>
+
+<ul>
+<li><code>A</code> is an integer from 0-255.</li>
+<li><code>BBBB</code> is a 4-character string that represents the presence of walls (<code>N</code>, <code>E</code>, <code>W</code>, <code>S</code>) or open spaces.
+
+<ul>
+<li><code>N</code>, <code>E</code>, <code>W</code>, or <code>S</code> means there is a wall to the north, east, west, or south respectively.</li>
+<li><code>*</code> acts as a wildcard (matches both wall and empty space).</li>
+<li>Any other non-whitespace character represents an empty cell.</li>
+<li>The characters <strong>must always be written in NEWS order</strong>.</li>
+</ul>
+</li>
+<li><code>C</code> is the direction the bot should move (N, W, E, S) or <code>X</code> to indicate no movement. Moving into a wall is an error.</li>
+<li><code>D</code> is the new integer value to store. (It replaces the previous value.)</li>
+</ul>
+
+
+<p>No two rules should cover the same integer + wall combination.</p>
+
+<p>The bot always starts with integer value <code>0</code> stored.</p>
+
+<h3>Examples:</h3>
+
+<p><code>
+0 **** -&gt; E 0
+</code>
+This rule makes the bot move east until it &ldquo;crashes&rdquo; into a wall.</p>
+
+<p><code>
+0 NEW_ -&gt; S 1
+</code>
+If there are walls to the north, east, and west, and there is an empty cell to the south, this rule makes the bot move south and store the integer <code>1</code></p>
