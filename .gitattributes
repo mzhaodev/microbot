@@ -1,0 +1,2 @@
+# Mark docs/** as not documentation for GitHub Linguist
+docs/** -linguist-documentation
