@@ -10,13 +10,21 @@ body {
     text-align: center;
 }
 
+.game {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    align-items: flex-start;
+}
+
 h1 {
     margin-top: 0;
 }
 
 .board {
     width: 500px;
-    float: left;
+    max-width: 100%;
 }
 
 .buttonswrapper {
@@ -86,7 +94,8 @@ td {
 }
 
 .rightwrapper {
-    float: right;
+    width: 550px;
+    max-width: 100%;
 }
 
 #stepwrap {
@@ -110,7 +119,9 @@ td {
 #rules.plain {
     resize: vertical;
     height: 320px;
-    width: 550px;
+    width: 100%;
+    max-width: 550px;
+    box-sizing: border-box;
 }
 
 #rules.fdrag {
@@ -119,6 +130,9 @@ td {
     background-image: url("import.svg");
     background-repeat: no-repeat;
     background-position: center;
+    width: 100%;
+    max-width: 550px;
+    box-sizing: border-box;
 }
 
 #spinner {
@@ -153,4 +167,7 @@ td {
 #output {
     font-size: 12px;
     resize: none;
+    width: 100%;
+    max-width: 550px;
+    box-sizing: border-box;
 }
