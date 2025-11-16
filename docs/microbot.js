@@ -262,7 +262,7 @@ function reset_rules(ask) {
 # Comments start with '#'
 
 # Remember that rules are formatted as
-# State Surroundings = Move NewState
+# State Surroundings -> Move NewState
 
 # Microbot starts in state 0.
 # Here, state 0 goes N as far as possible
