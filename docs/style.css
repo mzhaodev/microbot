@@ -66,6 +66,12 @@ h1 {
     max-width: 100%;
 }
 
+.grid-hint {
+    font-size: 12px;
+    margin: 6px 0 0;
+    color: #fff;
+}
+
 .buttonswrapper {
     line-height: 25px;
 }
@@ -141,8 +147,9 @@ td {
     display: none;
 }
 
-#ruleswrap {
-    position: relative;
+#runwrap,
+#stepwrap {
+    margin-top: 15px;
 }
 
 #ruleswrap.plain {

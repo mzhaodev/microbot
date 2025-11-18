@@ -1,25 +1,13 @@
 const $ = document.getElementById.bind(document);
 
-var db_warnings = $("debug_warnings");
-var db_microbot = $("debug_microbot");
-
 var bot;
 var startpad;
 
 var output_elem = $("output");
-function output(str, nl, noflush) {
-  if (!output.cache) output.cache = "";
-  if (output.ret) output.cache += "\n";
-  output.ret = nl;
-  output.cache += str;
-  if (!noflush) {
-    output_elem.value += output.cache;
-    output_elem.scrollTop = output_elem.scrollHeight;
-    output.cache = "";
-  }
+function output(str, nl = true) {
+  output_elem.value += nl ? str + "\n" : str;
+  output_elem.scrollTop = output_elem.scrollHeight;
 }
-
-$("flush").addEventListener("click", (e) => output(""));
 
 const rows = 25;
 const cols = 25;
@@ -76,6 +64,7 @@ function setstartloc(i, j) {
   floormap[i][j] = 0;
   cell_elems[i][j].className = "startpad";
   startpad = [i, j];
+  output("Start pad set at row " + (i + 1) + ", column " + (j + 1) + ".");
 }
 
 for (var i = 0; i < rows; ++i) {
@@ -142,7 +131,7 @@ function loadfloormap(code) {
   for (var i = 0; i < code.length; ++i) {
     var c = charset.indexOf(code[i]);
     if (c === -1) {
-      output("ERROR: map code contains invalid characters.", true);
+      output("ERROR: map code contains invalid characters.");
       return false;
     }
     for (var j = 0; j < 6; ++j) {
@@ -151,7 +140,7 @@ function loadfloormap(code) {
     }
   }
   if (!hasEmpty) {
-    output("ERROR: no place for starting pad", true);
+    output("ERROR: no place for starting pad");
     return false;
   }
   for (var i = 0; i < rows; ++i) floormap[i][0] = floormap[i][cols - 1] = 1;
@@ -179,10 +168,9 @@ function normalize_map_code(code) {
 }
 
 function initmap(code) {
-  const dbwarn = db_warnings.checked;
   const normalized_code = normalize_map_code(code);
   if (normalized_code.length !== map_code_length) {
-    if (dbwarn) output("ERROR: invalid map code; loading aborted.", true);
+    output("ERROR: invalid map code; loading aborted.");
     return false;
   }
   if (!loadfloormap(normalized_code)) {
@@ -193,19 +181,12 @@ function initmap(code) {
 
 initmap(puzzlemaps[0]);
 
-// $("clearmap").addEventListener("click", (e) => drawfloor());
-
-// const clearmapcode = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-// $("clearmap").addEventListener("click", e => {loadfloormap(clearmapcode); output("Map cleared.", true);});
-// const fillmapcode = "-_______________________________________________________________________________________B";
-// $("fillmap").addEventListener("click", e => {loadfloormap(fillmapcode); output("Map filled.", true);});
-
 var map_buttons_wrap = $("mapbuttons");
 
 function selectmap_maker(a) {
   return (e) => {
     initmap(puzzlemaps[a]);
-    output("Selected map " + a, true);
+    output("Selected map " + a);
   };
 }
 
@@ -225,7 +206,7 @@ $("importmap").addEventListener("click", () => {
       "Invalid map code. Please ensure you pasted the full code from Export Map.",
     );
   } else {
-    output("Imported map from code.", true);
+    output("Imported map from code.");
   }
 });
 
@@ -337,8 +318,6 @@ $("importf").addEventListener("click", (e) => $("impfile").click());
 $("impfile").addEventListener("change", (e) => import_file(e.target.files[0]));
 
 function load_rules() {
-  const dblr = true;
-  const dbwarn = db_warnings.checked;
   var instructions = rules_elem.value.toUpperCase().split("\n");
   var instrucc = 0;
   var rules = [];
@@ -365,12 +344,11 @@ function load_rules() {
       /* instruction[2] != '=' && */ instruction[2] != "->"
     ) {
       // output(instruction, true);
-      output("ERROR: parsing line " + (i + 1) + " failed.", true, true);
+      output("ERROR: parsing line " + (i + 1) + " failed.");
       return;
     }
     if (instruction.length > 5) {
-      if (dbwarn)
-        output("WARNING: Ignoring extra tokens in line " + (i + 1), true, true);
+      output("WARNING: Ignoring extra tokens in line " + (i + 1));
     }
     ++instrucc;
     for (j = 0; j < 16; ++j)
@@ -380,7 +358,7 @@ function load_rules() {
           rules[j][instruction[0]].hasOwnProperty("T")
         ) {
           // conflicting rules
-          output("ERROR: duplicate rule on line " + i, true, true);
+          output("ERROR: duplicate rule on line " + i);
           return;
         }
         rules[j][instruction[0]] = {
@@ -389,14 +367,14 @@ function load_rules() {
         };
       }
   }
-  output("" + instrucc + " instructions loaded.", true);
+  output("" + instrucc + " instructions loaded.");
   return rules;
 }
 
 function move() {
   var rule = bot.rules[bot.wallmask[bot.locR][bot.locC]][bot.state];
   if (!rule) {
-    if (db_warnings.checked) output("WARNING: no rule found", true, true);
+    output("WARNING: no rule found");
     return bot;
   }
   switch (rule.T) {
@@ -423,12 +401,12 @@ function move() {
 
 function run_step() {
   return (e) => {
-    if (db_microbot.checked) output("state: " + bot.state, true);
+    output("state: " + bot.state);
     cell_elems[bot.locR][bot.locC].className = "clean";
     bot = move();
     cell_elems[bot.locR][bot.locC].className = "bot";
     if (floormap[bot.locR][bot.locC]) {
-      output("MOVED INTO WALL. STOPPING...", true);
+      output("MOVED INTO WALL. STOPPING...");
       bot.stop();
     }
     if (!bot.seen[bot.locR][bot.locC]) {
@@ -436,14 +414,14 @@ function run_step() {
       --bot.left;
     }
     if (bot.left == 0) {
-      output("FLOOR CLEARED; PASSED", true);
+      output("FLOOR CLEARED; PASSED");
       bot.stop();
       return;
     }
     if (!bot.visited[bot.locR][bot.locC][bot.state])
       bot.visited[bot.locR][bot.locC][bot.state] = true;
     else {
-      output("LOOP DETECTED; STOPPING; FAILED", true);
+      output("LOOP DETECTED; STOPPING; FAILED");
       bot.stop();
       return;
     }
@@ -458,7 +436,7 @@ function start_microbot() {
   }
   var rules = load_rules();
   if (!rules) {
-    output("ERROR: loading rules failed", true);
+    output("ERROR: loading rules failed");
     return;
   }
   drawfloor();
@@ -506,7 +484,7 @@ function start_microbot() {
   $("step1").addEventListener("click", run_step(), { once: true });
   function start_auto() {
     if (bot.ivl) {
-      output("U WOT M8", true);
+      output("U WOT M8");
       return;
     }
     bot.ivl = setInterval(() => {
@@ -535,7 +513,7 @@ $("step10").addEventListener("click", (e) => {
 
 function test_microbot_all() {
   table_elem.classList.add("noedit");
-  output("TESTING ALL CASES:", true);
+  output("TESTING ALL CASES:");
   var rules = load_rules();
   if (!rules) return;
   var total = 0;
@@ -558,7 +536,7 @@ function test_microbot_all() {
   }
   function test_microbot(r, c) {
     if (!rules) {
-      output("ERROR: loading rules failed", true);
+      output("ERROR: loading rules failed");
       table_elem.classList.remove("noedit");
       return false;
     }
@@ -600,7 +578,7 @@ function test_microbot_all() {
         cell_elems[i][j].className = "success";
       } else cell_elems[i][j].className = "failed";
     }
-  output("TESTING ALL DONE; " + passed + "/" + total + " passed", true);
+  output("TESTING ALL DONE; " + passed + "/" + total + " passed");
   table_elem.classList.remove("noedit");
 }
 
