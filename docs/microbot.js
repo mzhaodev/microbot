@@ -182,11 +182,7 @@ function initmap(code) {
   const dbwarn = db_warnings.checked;
   const normalized_code = normalize_map_code(code);
   if (normalized_code.length !== map_code_length) {
-    if (dbwarn)
-      output(
-        "ERROR: invalid map code; loading aborted.",
-        true,
-      );
+    if (dbwarn) output("ERROR: invalid map code; loading aborted.", true);
     return false;
   }
   if (!loadfloormap(normalized_code)) {
