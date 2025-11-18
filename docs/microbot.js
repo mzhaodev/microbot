@@ -2,38 +2,9 @@ const $ = document.getElementById.bind(document);
 
 var db_warnings = $("debug_warnings");
 var db_microbot = $("debug_microbot");
-var db_engine = $("show_debug");
-var db_engine_wrapper = $("db_engine_checkboxes");
-var db_initmap = $("debug_initmap");
 
-function db_engine_toggle() {
-  if (db_engine.checked) db_engine_wrapper.style.display = "block";
-  else db_engine_wrapper.style.display = "none";
-}
-
-db_engine.addEventListener("change", db_engine_toggle);
-
-function db_toggle_callback(elem, ls_name) {
-  return (e) => {
-    if (elem.checked) localStorage.setItem(ls_name, "1");
-    else if (localStorage.getItem(ls_name)) localStorage.removeItem(ls_name);
-  };
-}
-
-db_engine.addEventListener(
-  "change",
-  db_toggle_callback(db_engine, "db_engine"),
-);
-db_initmap.addEventListener(
-  "change",
-  db_toggle_callback(db_initmap, "db_initmap"),
-);
-
-if (localStorage.getItem("db_engine")) {
-  db_engine.checked = true;
-  db_engine_wrapper.style.display = "block";
-  if (localStorage.getItem("db_initmap")) db_initmap.checked = true;
-}
+var bot;
+var startpad;
 
 var output_elem = $("output");
 function output(str, nl, noflush) {
@@ -52,6 +23,7 @@ $("flush").addEventListener("click", (e) => output(""));
 
 const rows = 25;
 const cols = 25;
+const map_code_length = Math.ceil(((rows - 2) * (cols - 2)) / 6);
 
 var cell_elems = [];
 
@@ -79,29 +51,31 @@ for (var i = 0; i < rows; ++i) floormap.push([]);
 function oncellmousepressgen(i, j) {
   return (e) => {
     if (i == 0 || j == 0 || i == rows - 1 || j == cols - 1) return;
-    if (startpad[0] == i && startpad[1] == j) return;
+    if (startpad && startpad[0] == i && startpad[1] == j) return;
     if (e.buttons & 1) {
       if (e.shiftKey) {
         setstartloc(i, j);
         return;
       }
-      floormap[i][j] = 1;
+      if (floormap[i][j] !== 1) {
+        floormap[i][j] = 1;
+        drawfloor();
+      }
     }
     if (e.buttons & 2) {
-      floormap[i][j] = 0;
+      if (floormap[i][j] !== 0) {
+        floormap[i][j] = 0;
+        drawfloor();
+      }
     }
-    window.location.hash = "#" + savefloormap();
   };
 }
 
-var startpad;
-
 function setstartloc(i, j) {
-  cell_elems[startpad[0]][startpad[1]].className = "empty";
+  if (startpad) cell_elems[startpad[0]][startpad[1]].className = "empty";
   floormap[i][j] = 0;
   cell_elems[i][j].className = "startpad";
   startpad = [i, j];
-  window.location.hash = "#" + savefloormap();
 }
 
 for (var i = 0; i < rows; ++i) {
@@ -112,19 +86,26 @@ for (var i = 0; i < rows; ++i) {
 }
 
 function drawfloor() {
-  var padset = startpad ? !floormap[startpad[0]][startpad[1]] : false;
+  var next_startpad =
+    startpad && !floormap[startpad[0]][startpad[1]]
+      ? [startpad[0], startpad[1]]
+      : null;
   for (var i = 0; i < rows; ++i) {
     for (var j = 0; j < cols; ++j) {
       if (floormap[i][j]) cell_elems[i][j].className = "wall";
       else {
-        if (!padset) {
-          startpad = [i, j];
-          padset = true;
-        } else cell_elems[i][j].className = "empty";
+        cell_elems[i][j].className = "empty";
+        if (!next_startpad) next_startpad = [i, j];
       }
     }
   }
+  if (!next_startpad) {
+    startpad = undefined;
+    return false;
+  }
+  startpad = next_startpad;
   cell_elems[startpad[0]][startpad[1]].className = "startpad";
+  return true;
 }
 
 function savefloormap() {
@@ -150,33 +131,33 @@ function savefloormap() {
 }
 
 function loadfloormap(code) {
-  window.location.hash = code;
   const charset =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+  var hasEmpty = false;
   function sf(a, b) {
     if (a >= (rows - 2) * (cols - 2)) return;
     floormap[Math.floor(a / (cols - 2)) + 1][(a % (cols - 2)) + 1] = b;
+    if (b === 0) hasEmpty = true;
   }
-  for (var i = 0; i < (rows - 2) * (cols - 2); ++i) {
+  for (var i = 0; i < code.length; ++i) {
     var c = charset.indexOf(code[i]);
+    if (c === -1) {
+      output("ERROR: map code contains invalid characters.", true);
+      return false;
+    }
     for (var j = 0; j < 6; ++j) {
       sf(6 * i + j, c % 2);
       c = Math.floor(c / 2);
     }
   }
+  if (!hasEmpty) {
+    output("ERROR: no place for starting pad", true);
+    return false;
+  }
   for (var i = 0; i < rows; ++i) floormap[i][0] = floormap[i][cols - 1] = 1;
   for (var i = 0; i < cols; ++i) floormap[0][i] = floormap[rows - 1][i] = 1;
   drawfloor();
-  if (!floormap[startpad[0]][startpad[1]]) return;
-  for (var i = 0; i < rows; ++i) {
-    for (var j = 0; j < cols; ++j) {
-      if (!floormap[i][j]) {
-        cell_elems[i][j].className = "startpad";
-        startpad = [i, j];
-        return;
-      }
-    }
-  }
+  return true;
 }
 
 const puzzlemaps = [
@@ -190,42 +171,31 @@ const puzzlemaps = [
   "AAARAgDUIBGRgDUYgAEYAQA4DAAADAAQiAAEqHBBCAhCAAgAAABIEgAA-QcAQkB4PgAEAQAGEQEHGwBOQAAEAAAEA",
 ];
 
-function initmap(defaultcode, firstinit) {
-  const dbwarn = db_warnings.checked;
-  const dbinitmap = db_engine.checked && db_initmap.checked;
-  if (dbinitmap) output("loading map...", false);
-  if (!firstinit && defaultcode == window.location.hash) {
-    if (dbinitmap) output("Nothing to do!", true);
-    return;
-  }
-  if (
-    window.location.hash &&
-    window.location.hash.length - 1 == Math.ceil(((rows - 2) * (cols - 2)) / 6)
-  ) {
-    if (
-      window.location.hash ==
-      "#________________________________________________________________________________________B"
-    ) {
-      if (dbinitmap) output("FAILED", true);
-      if (dbwarn) output("ERROR: no place for starting pad", true);
-      output("Selecting map0...", false);
-      window.location.hash = "#" + puzzlemaps[0];
-      output("OK", true);
-      return;
-    }
-    loadfloormap(window.location.hash.replace("#", ""));
-  } else {
-    if (dbwarn)
-      output("WARNING: map URL incorrect length; loading previous map", true);
-    loadfloormap(defaultcode.replace("#", ""));
-  }
-  if (dbinitmap) output("DONE", true);
+function normalize_map_code(code) {
+  if (!code) return "";
+  var trimmed = code.trim();
+  if (trimmed.startsWith("#")) trimmed = trimmed.substring(1);
+  return trimmed;
 }
 
-initmap("#" + puzzlemaps[0], true);
-window.addEventListener("hashchange", (e) =>
-  initmap(e.oldURL.substring(e.oldURL.indexOf("#"))),
-);
+function initmap(code) {
+  const dbwarn = db_warnings.checked;
+  const normalized_code = normalize_map_code(code);
+  if (normalized_code.length !== map_code_length) {
+    if (dbwarn)
+      output(
+        "ERROR: invalid map code; loading aborted.",
+        true,
+      );
+    return false;
+  }
+  if (!loadfloormap(normalized_code)) {
+    return false;
+  }
+  return true;
+}
+
+initmap(puzzlemaps[0]);
 
 // $("clearmap").addEventListener("click", (e) => drawfloor());
 
@@ -238,7 +208,7 @@ var map_buttons_wrap = $("mapbuttons");
 
 function selectmap_maker(a) {
   return (e) => {
-    window.location.hash = "#" + puzzlemaps[a];
+    initmap(puzzlemaps[a]);
     output("Selected map " + a, true);
   };
 }
@@ -250,6 +220,23 @@ for (var i = 0; i < puzzlemaps.length; ++i) {
     .appendChild(buttontag)
     .addEventListener("click", selectmap_maker(i));
 }
+
+$("importmap").addEventListener("click", () => {
+  var code = prompt("Enter map code");
+  if (code === null) return;
+  if (!initmap(code)) {
+    alert(
+      "Invalid map code. Please ensure you pasted the full code from Export Map.",
+    );
+  } else {
+    output("Imported map from code.", true);
+  }
+});
+
+$("exportmap").addEventListener("click", () => {
+  var code = savefloormap();
+  prompt("Copy this map code", code);
+});
 
 var rules_elem = $("rules");
 
@@ -410,8 +397,6 @@ function load_rules() {
   return rules;
 }
 
-var bot;
-
 function move() {
   var rule = bot.rules[bot.wallmask[bot.locR][bot.locC]][bot.state];
   if (!rule) {
@@ -471,6 +456,10 @@ function run_step() {
 }
 
 function start_microbot() {
+  if (!startpad) {
+    alert("Set a starting pad before running the program.");
+    return;
+  }
   var rules = load_rules();
   if (!rules) {
     output("ERROR: loading rules failed", true);

@@ -28,6 +28,8 @@
 	  <div class="buttonswrapper">
       <!-- <button id="clearmap">Clear Map</button> -->
 	    <!-- <button id="fillmap">Fill Map</button> -->
+	    <button id="importmap">Import Map</button>
+	    <button id="exportmap">Export Map</button>
 	    <div id="mapbuttons"></div>
 	  </div>
 	</caption>
@@ -53,15 +55,11 @@
 	<button id="step10">10 steps</button>
 	<button id="auto">auto</button>
       </div>
-      <div class="buttonswrapper">
+	<div class="buttonswrapper">
 	<label><input type="checkbox" class="check" id="debug_warnings" checked />warnings</label>
 	<label><input type="checkbox" class="check" id="debug_microbot" checked />microbot debug</label>
-	<label><input type="checkbox" class="check" id="show_debug" />engine debug</label>
-	<div id="db_engine_checkboxes">
-	  <button id="flush">flush</button>
-	  <label><input type="checkbox" class="check" id="debug_initmap" />initmap()</label>
+	<button id="flush">flush</button>
 	</div>
-      </div>
       <textarea id="output" rows="10" cols="80" title="Output Console" readonly></textarea>
     </div>
   </div>

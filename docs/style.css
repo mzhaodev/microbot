@@ -203,10 +203,6 @@ td {
     vertical-align: middle;
 }
 
-#db_engine_checkboxes {
-    display: none;
-}
-
 #output {
     font-size: 12px;
     resize: none;
